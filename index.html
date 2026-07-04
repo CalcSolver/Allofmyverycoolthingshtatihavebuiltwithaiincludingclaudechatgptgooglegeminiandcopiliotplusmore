@@ -3,106 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACMemes & Arcade Portal</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <title>ACMemes Portal Hub</title>
     <style>
-        /* Portal Navigation Rail Styling */
+        :root {
+            --bg-dark: #202225;
+            --bg-main: #36393f;
+            --sidebar-bg: #2f3136;
+            --accent: #5865f2;
+            --text-main: #ffffff;
+            --text-muted: #b9bbbe;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            height: 100vh; 
+            width: 100vw; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hidden { display: none !important; }
+
+        /* --- AUTH SCREEN STYLING --- */
+        .auth-container {
+            background: var(--sidebar-bg);
+            padding: 40px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .auth-container h2 { margin-bottom: 8px; font-size: 24px; }
+        .auth-container p { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
+        .auth-form { display: flex; flex-direction: column; gap: 16px; }
+        .auth-form input {
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid #111;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+        }
+        .auth-form button {
+            background: var(--accent);
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .auth-form button:hover { background: #4752c4; }
+        .toggle-text { margin-top: 16px; font-size: 14px; color: var(--text-muted); }
+        .toggle-text span { color: var(--accent); cursor: pointer; }
+
+        /* --- MAIN INTERFACE PORTAL LAYOUT --- */
+        .app-layout {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-main);
+        }
+
+        /* The Left Navigation Rail */
         .portal-rail {
-            width: 70px;
-            background: #202225;
+            width: 72px;
+            background: var(--bg-dark);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px 0;
-            gap: 15px;
-            border-right: 1px solid #111;
+            padding: 12px 0;
+            gap: 8px;
         }
+
         .portal-icon {
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: #36393f;
+            background: var(--bg-main);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
             transition: all 0.2s ease;
-            color: #b9bbbe;
+            user-select: none;
         }
         .portal-icon:hover, .portal-icon.active {
             border-radius: 16px;
-            background: #5865f2;
-            color: #fff;
+            background: var(--accent);
         }
-        .frame-container {
+
+        .rail-divider {
+            width: 32px;
+            height: 2px;
+            background: #4f545c;
+            margin: 4px 0;
+            border-radius: 1px;
+        }
+
+        /* Frame Content Windows */
+        .view-container {
             flex: 1;
-            display: flex;
             height: 100vh;
-            overflow: hidden;
+            position: relative;
         }
         iframe {
             width: 100%;
             height: 100%;
             border: none;
+            background: var(--bg-main);
         }
     </style>
 </head>
 <body>
 
-    <div id="auth-container" class="auth-box">
-        <h2>Welcome to ACMemes Portal</h2>
-        <form id="auth-form" onsubmit="event.preventDefault(); handleLogin();">
-            <input type="email" id="email" placeholder="Email Address" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit" id="submit-btn">Login</button>
+    <div id="auth-box" class="auth-container">
+        <h2>Welcome back!</h2>
+        <p id="auth-subtitle">We're so excited to see you again!</p>
+        <form id="login-form" class="auth-form" onsubmit="event.preventDefault(); login();">
+            <input type="email" placeholder="Email Address" required>
+            <input type="password" placeholder="Password" required>
+            <button type="submit">Log In</button>
         </form>
-        <p id="toggle-auth">Don't have an account? <span id="toggle-link">Sign Up</span></p>
+        <div class="toggle-text">Need an account? <span onclick="alert('Signup system active!')">Register</span></div>
     </div>
 
-    <div id="app-container" class="hidden" style="display: flex; height: 100vh; width: 100vw; overflow: hidden;">
+    <div id="app-box" class="app-layout hidden">
         
         <div class="portal-rail">
-            <div class="portal-icon active" id="btn-show-chat" title="ACMemes Chat">💬</div>
-            <div class="portal-icon" id="btn-show-arcade" title="Game Arcade">🎮</div>
+            <div class="portal-icon active" id="tab-chat" title="ACMemes Chat Room">💬</div>
+            <div class="rail-divider"></div>
+            <div class="portal-icon" id="tab-arcade" title="Retro Arcade">🎮</div>
         </div>
 
-        <div class="frame-container">
-            <div id="view-chat" style="display: flex; width: 100%; height: 100%;">
-                </div>
-
-            <div id="view-arcade" class="hidden" style="width: 100%; height: 100%;">
-                <iframe src="arcade.html" id="arcade-frame"></iframe>
-            </div>
+        <div class="view-container">
+            <iframe id="frame-chat" src="chat.html" class=""></iframe>
+            
+            <iframe id="frame-arcade" src="arcade.html" class="hidden"></iframe>
         </div>
 
     </div>
 
     <script>
-        // Simple View Switching Logic
-        function handleLogin() {
-            document.getElementById('auth-container').classList.add('hidden');
-            document.getElementById('app-container').classList.remove('hidden');
+        function login() {
+            document.getElementById('auth-box').classList.add('hidden');
+            document.getElementById('app-box').classList.remove('hidden');
         }
 
-        const chatBtn = document.getElementById('btn-show-chat');
-        const arcadeBtn = document.getElementById('btn-show-arcade');
-        const chatView = document.getElementById('view-chat');
-        const arcadeView = document.getElementById('view-arcade');
+        const tabChat = document.getElementById('tab-chat');
+        const tabArcade = document.getElementById('tab-arcade');
+        const frameChat = document.getElementById('frame-chat');
+        const frameArcade = document.getElementById('frame-arcade');
 
-        chatBtn.addEventListener('click', () => {
-            chatBtn.classList.add('active');
-            arcadeBtn.classList.remove('active');
-            chatView.classList.remove('hidden');
-            arcadeView.classList.add('hidden');
+        tabChat.addEventListener('click', () => {
+            tabChat.classList.add('active');
+            tabArcade.classList.remove('active');
+            frameChat.classList.remove('hidden');
+            frameArcade.classList.add('hidden');
         });
 
-        arcadeBtn.addEventListener('click', () => {
-            arcadeBtn.classList.add('active');
-            chatBtn.classList.remove('active');
-            arcadeView.classList.remove('hidden');
-            chatView.classList.add('hidden');
+        tabArcade.addEventListener('click', () => {
+            tabArcade.classList.add('active');
+            tabChat.classList.remove('active');
+            frameArcade.classList.remove('hidden');
+            frameChat.classList.add('hidden');
         });
     </script>
 </body>
