@@ -2,140 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACMemes Arcade Central</title>
+    <title>Arcade Interface</title>
     <style>
-        body {
-            background-color: #36393f;
-            color: #fff;
-            font-family: system-ui, sans-serif;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .header-area {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #202225;
-            padding-bottom: 15px;
-        }
-        h1 { margin: 0; font-size: 24px; color: #fff; }
-        .search-bar {
-            padding: 10px 15px;
-            width: 300px;
-            background: #202225;
-            border: 1px solid #444;
-            border-radius: 6px;
-            color: #fff;
-            outline: none;
-        }
-        /* Arcade Grid Rules */
-        .arcade-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 20px;
-        }
-        .game-card {
-            background: #2f3136;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-        .game-card:hover {
-            transform: translateY(-5px);
-            background: #40444b;
-            border-color: #5865f2;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .game-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: cover;
-            margin-bottom: 10px;
-            background: #202225; /* fallback if icon missing */
-        }
-        .game-title {
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .play-btn {
-            background: #3ba55d;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .play-btn:hover { background: #2e854b; }
+        body { background: #313338; color: #fff; font-family: sans-serif; padding: 25px; margin: 0; }
+        h2 { margin-bottom: 20px; font-weight: 600; letter-spacing: 0.5px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .card { background: #2b2d31; border-radius: 12px; padding: 15px; text-align: center; border: 1px solid #1e1f22; transition: 0.2s; cursor: pointer; }
+        .card:hover { transform: translateY(-4px); border-color: #5865f2; background: #35373c; }
+        .icon-box { width: 70px; height: 70px; background: #1e1f22; border-radius: 16px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .title { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #f2f3f5; }
+        .play-btn { background: #248046; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: bold; width: 100%; cursor: pointer; }
+        .play-btn:hover { background: #1a6535; }
     </style>
 </head>
 <body>
 
-    <div class="header-area">
-        <h1>🕹️ Retro Arcade Portal (<span id="game-count">0</span> Games)</h1>
-        <input type="text" id="arcade-search" class="search-bar" placeholder="Search a game...">
-    </div>
-
-    <div class="arcade-grid" id="arcade-container"></div>
+    <h2>🕹️ RETRO SYSTEM ARCADE</h2>
+    <div class="grid" id="game-grid"></div>
 
     <script>
-        // Simply list your games here. JavaScript handles drawing them all perfectly!
-        const gamesList = [
-            { id: "game1", title: "Pac-Man Retro", icon: "Icons/pacman.png", url: "games/pacman/index.html" },
-            { id: "game2", title: "Space Invaders", icon: "Icons/invaders.png", url: "games/space/index.html" },
-            { id: "game3", title: "Tetris Classic", icon: "Icons/tetris.png", url: "games/tetris.html" },
-            { id: "game4", title: "Asteroids", icon: "Icons/asteroids.png", url: "https://example-external-game.com" },
-            // Add your other 65+ game entry objects down here seamlessly...
+        // Use raw.githack.com to turn raw GitHub script files into runnable code inside the page!
+        const games = [
+            { title: "1942 Arcade", icon: "✈️", url: "https://raw.githack.com/CalcSolver/Wii/main/1942.html" },
+            { title: "Pac-Man Classic", icon: "🕹️", url: "https://raw.githack.com/CalcSolver/Wii/main/pacman.html" }
         ];
 
-        const container = document.getElementById('arcade-container');
-        const searchInput = document.getElementById('arcade-search');
-        document.getElementById('game-count').innerText = gamesList.length;
-
-        // Function to build elements inside DOM
-        function renderGames(games) {
-            container.innerHTML = "";
-            if(games.length === 0) {
-                container.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#b9bbbe;">No games found matching your search.</p>`;
-                return;
-            }
-            
-            games.forEach(game => {
-                const card = document.createElement('div');
-                card.className = 'game-card';
-                card.onclick = () => window.open(game.url, '_blank'); // Opens your game file
-
-                card.innerHTML = `
-                    <img src="${game.icon}" class="game-icon" alt="${game.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 24 24\' fill=\'%2372767d\'><rect width=\'24\' height=\'24\' fill=\'%23202225\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23fff\' font-size=\'10\'>🎮</text></svg>'">
-                    <div class="game-title">${game.title}</div>
-                    <button class="play-btn">PLAY</button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Live Filtering Logic
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const filtered = gamesList.filter(g => g.title.toLowerCase().includes(query));
-            renderGames(filtered);
+        const grid = document.getElementById('game-grid');
+        games.forEach(game => {
+            const el = document.createElement('div');
+            el.className = 'card';
+            el.onclick = () => window.open(game.url, '_blank');
+            el.innerHTML = `
+                <div class="icon-box">${game.icon}</div>
+                <div class="title">${game.title}</div>
+                <button class="play-btn">LAUNCH</button>
+            `;
+            grid.appendChild(el);
         });
-
-        // Initialize First View Render
-        renderGames(gamesList);
     </script>
 </body>
 </html>
